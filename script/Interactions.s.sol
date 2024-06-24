@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 import {Script, console} from "forge-std/Script.sol";
 import {HelperConfig} from "./HelperConfig.s.sol";
 import {Raffle} from "../src/Raffle.sol";
-import {DevOpsTools} from "foundry-devops/src/DevOpsTools.sol";
+import {DevOpsTools} from "foundry-devops/src/DevOpsTools.sol";l
 import {VRFCoordinatorV2Mock} from "../test/mocks/VRFCoordinatorV2Mock.sol";
 import {LinkToken} from "../test/mocks/LinkToken.sol";
 
@@ -27,9 +27,12 @@ contract CreateSubscription is Script {
     function createSubscription(
         address vrfCoordinatorV2,
         uint256 deployerKey
-    ) public returns (uint64, address) {
+    ) public returns (uint64, address) // sebenarnya address disini tidak terlalu penting si {
         console.log("Creating subscription on chainId: ", block.chainid);
         vm.startBroadcast(deployerKey);
+
+// KITA MEMANGGIL INHERITANCE DARI VRFMOCK YANG MENGEMBALIKAN UINT64 SUBID //
+
         uint64 subId = VRFCoordinatorV2Mock(vrfCoordinatorV2)
             .createSubscription();
         vm.stopBroadcast();
@@ -42,7 +45,7 @@ contract CreateSubscription is Script {
         return createSubscriptionUsingConfig();
     }
 }
-
+// kita membuat sinyal ke vrfcoordinator dengan paramter ini , ini main function yang akan di panggil nanti 
 contract AddConsumer is Script {
     function addConsumer(
         address contractToAddToVrf,
@@ -60,6 +63,9 @@ contract AddConsumer is Script {
         );
         vm.stopBroadcast();
     }
+
+/// jangan bingung ini akan memanggil fungsi di atas nya , karena nanti kita akan deploy , jadi semua fungsi aktif , tapi blum di panggil jadi tidak eror
+/// nah saat dii run , kan sudah aktif jadi tidak eror 
 
     function addConsumerUsingConfig(address mostRecentlyDeployed) public {
         HelperConfig helperConfig = new HelperConfig();
@@ -125,6 +131,7 @@ contract FundSubscription is Script {
             vm.startBroadcast(deployerKey);
             VRFCoordinatorV2Mock(vrfCoordinatorV2).fundSubscription(
                 subId,
+
                 FUND_AMOUNT
             );
             vm.stopBroadcast();
